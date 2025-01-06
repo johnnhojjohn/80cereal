@@ -1,0 +1,150 @@
+---
+title: "visualization-analysis"
+output: html_document
+date: "2025-01-05"
+data-set-source: https://www.kaggle.com/datasets/crawford/80-cereals/data
+---
+
+*this document is for practicing visualizations*
+
+```{r message=FALSE, warning=FALSE}
+pacman::p_load(
+  rio,          # File import
+  here,         # File locator
+  skimr,        # get overview of data
+  tidyverse,    # data management + ggplot2 graphics, 
+  gtsummary,    # summary statistics and tests
+  rstatix,      # statistics
+  corrr,        # correlation analayis for numeric variables
+  janitor,      # adding totals and percents to tables
+  flextable,    # converting tables to HTML
+  ggplot2,hrbrthemes       # plots
+  
+)
+```
+
+importing table and initial understanding of the table
+
+```{r}
+cereal <- import("cereal.csv") 
+```
+
+mfr: Manufacturer of cereal
+    A = American Home Food Products;
+    G = General Mills
+    K = Kelloggs
+    N = Nabisco
+    P = Post
+    Q = Quaker Oats
+    R = Ralston Purina 
+
+check out document for more break downs
+
+
+```{r}
+skim(cereal)
+```
+```{r}
+head(cereal)
+```
+- no missing values
+- 3 categorical, 13 numeric (nutritional values)
+
+### pie charts
+
+```{r simple pie chart of manufacturer}
+pie(table(cereal$mfr), main="Pie Chart of Manufacturer")
+```
+
+pie charts are hard to read so let's move to bar plots
+
+guide used: https://r-graph-gallery.com/218-basic-barplots-with-ggplot2.html
+
+### bar plots
+
+```{r simple bar plot of frequency}
+ggplot(cereal) +
+  geom_bar(aes(x=mfr)) +
+  labs(y = "Count", x = "Manufacturer")
+```
+
+### controlling the color 
+
+ggplot(cereal, aes(x=as.factor(mfr))) +
+geom_bar(color="blue)
+
+```{r}
+ggplot(cereal, aes(x=as.factor(mfr))) + 
+  geom_bar(color="blue", fill="dodgerblue") + 
+  labs(y = "Count", x = "Manufacturer")
+```
+
+can flip with coord_flip
+
+```{r}
+ggplot(cereal, aes(x=as.factor(mfr))) + 
+  geom_bar(color="blue", fill="dodgerblue") + 
+  labs(y = "Count", x = "Manufacturer") +
+  coord_flip()
+```
+changing the width of the bars
+
+```{r}
+ggplot(cereal, aes(x=as.factor(mfr))) + 
+  geom_bar(color="blue", fill="dodgerblue", width = 0.2) + 
+  labs(y = "Count", x = "Manufacturer") 
+```
+
+### reorder a bariable with ggplot2
+https://r-graph-gallery.com/267-reorder-a-variable-in-ggplot2.html
+
+using forcats library
+
+```{r reordering barplot}
+ggplot(cereal) +
+    geom_bar(aes(x = forcats::fct_infreq(mfr),
+                 fill=type)) + 
+  labs(y = "Count", x = "Manufacturer") 
+```
+
+Boxplots of Nutritional Values
+
+```{r boxplot with base r}
+boxplot(rating~mfr, data=cereal)
+```
+
+boxplot (can use violinplot because there are only 1-2 points for mfr:A)
+
+```{r}
+cereal %>% 
+  ggplot(aes(x=mfr, y=rating, fill=mfr)) +
+  geom_boxplot() +
+  guides(fill="none")
+```
+
+```{r}
+cereal %>% 
+  mutate( type=ifelse(mfr=="Q","Highlighted","Normal")) %>% 
+  ggplot( aes(x=mfr, y=rating, fill=type, alpha=type)) + 
+  geom_boxplot() +
+    scale_fill_manual(values=c("#69b3a2", "grey")) +
+    scale_alpha_manual(values=c(1,0.1)) +
+    theme_ipsum() +
+    theme(legend.position = "none") +
+    xlab("")
+```
+
+
+
+Questions
+
+By Manufactorer what is the average protein, calories, etc?
+
+What cereal has the best rating?
+
+
+
+
+
+
+
