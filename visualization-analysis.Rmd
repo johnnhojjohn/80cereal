@@ -15,7 +15,7 @@ pacman::p_load(
   tidyverse,    # data management + ggplot2 graphics, 
   gtsummary,    # summary statistics and tests
   rstatix,      # statistics
-  corrr,        # correlation analayis for numeric variables
+  corrr, corrplot,# correlation analayis for numeric variables
   janitor,      # adding totals and percents to tables
   flextable,    # converting tables to HTML
   ggplot2,hrbrthemes       # plots
@@ -122,7 +122,7 @@ cereal %>%
   guides(fill="none")
 ```
 
-```{r}
+```{r highlight boxplot}
 cereal %>% 
   mutate( type=ifelse(mfr=="Q","Highlighted","Normal")) %>% 
   ggplot( aes(x=mfr, y=rating, fill=type, alpha=type)) + 
@@ -134,11 +134,52 @@ cereal %>%
     xlab("")
 ```
 
+```{r correlation}
+corr_columns <- cereal %>% select(c(calories:vitamins))
+
+corrr::correlate(corr_columns)
+```
+
+
+```{r correlation table with color}
+M<-cor(corr_columns)
+corrplot(M)
+```
+Nothing really stands out like potassium and fiber, and calories and sugar
+
+### testing different corrplots
+```{r}
+corrplot(M, method="pie")
+```
+
+
+```{r color correlation table}
+corrplot(M, method="color")
+```
+
+```{r color number}
+corrplot(M, method="number")
+```
+
+
+
+
 
 
 Questions
 
 By Manufactorer what is the average protein, calories, etc?
+
+```{r}
+cereal %>% 
+  group_by(mfr) %>% 
+  dplyr::summarise(mean = mean(calories), n=n())
+```
+
+
+
+
+
 
 What cereal has the best rating?
 
