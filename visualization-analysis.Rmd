@@ -176,8 +176,33 @@ cereal %>%
   dplyr::summarise(mean = mean(calories), n=n())
 ```
 
+```{r}
+skim(cereal)
+```
 
 
+Let's see nutritional value by brand
+
+Need to pivot table longer need variables:
+mfr, calories to potassium
+
+sample code from:
+https://tidyr.tidyverse.org/reference/pivot_longer.html
+
+who %>% pivot_longer(
+  cols = new_sp_m014:newrel_f65,
+  names_to = c("diagnosis", "gender", "age"),
+  names_pattern = "new_?(.*)_(.)(.*)",
+  values_to = "count"
+)
+
+```{r}
+cereal_pivot_long_brand_nValue <- cereal %>% pivot_longer(
+  cols = calories:potass,
+  names_to = "brand",
+  values_to = "nutritional_value"
+) %>% select(mfr,brand, nutritional_value)
+```
 
 
 
